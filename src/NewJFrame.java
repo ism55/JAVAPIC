@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import com.fazecast.jSerialComm.*;
 import java.io.IOException;
 import java.util.Arrays;
+import javax.swing.JOptionPane;
 
 public class NewJFrame extends javax.swing.JFrame {
 
@@ -15,6 +16,8 @@ public class NewJFrame extends javax.swing.JFrame {
     
     public SerialPort port;
     
+    public byte flag =0;
+    
 //    public String pVID_PID ="vid_04d8&pid_003f";
     /**
      * Creates new form NewJFrame
@@ -22,7 +25,7 @@ public class NewJFrame extends javax.swing.JFrame {
     public NewJFrame() {
         
         initComponents();
-         System.out.println("Hola1");
+         System.out.println("Hola3");
          
          
                        // determine which serial port to use
@@ -94,48 +97,56 @@ public class NewJFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(7, 7, 7)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(15, 15, 15)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
+                .addComponent(jButton3)
+                .addGap(21, 21, 21))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(89, 89, 89)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton1))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jButton3))
-                .addGap(31, 31, 31)
+                .addGap(35, 35, 35)
                 .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
                 .addComponent(jButton2)
-                .addGap(46, 46, 46))
+                .addGap(52, 52, 52))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        comando(prender);
-        jButton1.setBackground(Color.green);
-        jButton2.setBackground(Color.gray);
-        jButton1.setText("Prendido");
-        jButton2.setText("Apagar");
+        if (flag == 1){
+            comando(prender);
+            jButton1.setBackground(Color.green);
+            jButton2.setBackground(Color.gray);
+            jButton1.setText("Prendido");
+            jButton2.setText("Apagar");
+
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        comando(apagar);
-        jButton1.setBackground(Color.gray);
-        jButton2.setBackground(Color.red);
-        jButton1.setText("Prender");
-        jButton2.setText("Apagado");
+        if (flag==1){
+            comando(apagar);
+            jButton1.setBackground(Color.gray);
+            jButton2.setBackground(Color.red);
+            jButton1.setText("Prender");
+            jButton2.setText("Apagado");
+        
+        }
         
      
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -150,15 +161,27 @@ public class NewJFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         puerto = jTextField1.getText();
           port = SerialPort.getCommPort(puerto);             
-                // open and configure the port
-                if(port.openPort()) {
-                        System.out.println("Successfully opened the port.");
-                } else {
-                        System.out.println("Unable to open the port.");
-                        return;
-                }
+                // open and configure the portd
+                if(jButton3.getText()=="Desconectar"){
+                    port.closePort();
+                    jButton3.setText("Conectar");
+       
+                }else{
+                    if(port.openPort()) {
+                            System.out.println("Successfully opened the port.");
+                            jButton3.setText("Desconectar");
+                            flag = 1;
+                    } else {
+                            System.out.println("Unable to open the port.");
+                            JOptionPane.showMessageDialog(NewJFrame.this, "Sin conexion");
+                            jButton3.setText("Conectar");
+                            flag=0;
+                        
+                            return;
+                    }
+                }    
                 port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
-        port.setComPortParameters(9600, 8, 1,0);
+        port.setComPortParameters(115200, 8, 1,0);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     public void comando(byte envio)
